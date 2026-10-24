@@ -545,7 +545,26 @@ Build with `zip -qr` from inside each staging directory. Verify with `unzip -l` 
 6. Never use `runtime.bar_file.deploy` — it appends BARs instead of replacing. Never touch `default-integration-runtime`.
 7. To update BAR on existing runtime: `integration_runtimes` (action: replace) only.
 8. Poll for `status.phase = "Ready"` (up to 6 × 10 s attempts).
-9. `get_flow_auth` → `aceuser` credentials. Endpoint from `status.endpoints` where `name = "https endpoint"`.
+9. Retrieve credentials and endpoint — exact procedure:
+
+   ```bash
+   # get_flow_auth returns a credentialUrl + token; POST the token directly with curl to extract creds
+   # (the page is a single-use HTML page — no browser needed when you POST the token as a form field)
+   curl -s -X POST "<credentialUrl>" \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "token=<token>"
+   ```
+
+   Parse `username` and `password` out of the returned HTML — look for the two `<span class="row-value">` elements, e.g.:
+   ```
+   <span class="row-value">aceuser</span>
+   <span class="row-value">sQXUquV9l5wJM3cWtS46L2FdNbKie7E8</span>
+   ```
+   Username is always `aceuser`. The password is the value in the second `row-value` span.
+
+   Endpoint: `status.endpoints[]` where `name = "https endpoint"` → `uri`.
+
+   The credential link is **single-use and expires in 5 minutes**. Call `get_flow_auth` and curl the result in the same step — do not store the token between turns.
 
 ### Forcing a pod restart (after any configuration change)
 
