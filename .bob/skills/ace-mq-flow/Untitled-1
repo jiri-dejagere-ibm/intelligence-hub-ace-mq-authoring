@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: ace-john-reeve
+  namespace: ace-john-reeve
+spec:
+  displayName: ace-john-reeve
+  image: 'cp.stg.icr.io/cp/appconnect-operator-catalog:13.5.0-20260907-125623@sha256:162eb5a95ab0b5834ca4095053b7dce05bb81ba430eaaa600069c50ca7417d3e'
+  publisher: IBM
+  sourceType: grpc
